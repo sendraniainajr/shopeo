@@ -1,0 +1,16 @@
+.venv/
+node_modules/
+.next/
+.env
+.env.local
+.env.*.local
+.runtime/
+*.db
+*.db-*
+__pycache__/
+.pytest_cache/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.vercel/
+.ruff_cache/

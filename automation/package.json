@@ -1,0 +1,1 @@
+{"name":"shopeo-automation","private":true,"scripts":{"start":"n8n start"},"dependencies":{"n8n":"2.22.6"}}

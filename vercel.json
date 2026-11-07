@@ -1,0 +1,25 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["cdg1"],
+  "services": {
+    "api": {
+      "root": "api/",
+      "framework": "fastapi",
+      "entrypoint": "index:app"
+    },
+    "web": {
+      "root": "web/",
+      "framework": "nextjs",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "api",
+          "format": "url",
+          "env": "SHOPEO_API_URL"
+        }
+      ]
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": { "service": "web" } }],
+  "crons": [{ "path": "/api/integrations/dispatch", "schedule": "0 3 * * *" }]
+}
