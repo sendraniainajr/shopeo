@@ -51,6 +51,8 @@ Les tests utilisent une base distincte `shopeo_test` et couvrent notamment la co
 
 ## Déploiement Vercel et Supabase
 
+Avant le premier déploiement sur une base neuve, provisionner les deux rôles techniques dédiés et exécuter `api/provision.sql` comme propriétaire de la base. Cette étape crée le schéma privé avant la table de version Alembic. Elle a déjà été réalisée pour le projet Supabase Shopeo. Le rôle migrator reste limité à ce schéma ; il n'a pas de droit CREATE sur toute la base. Le script de migration vérifie ce prérequis et s'arrête avec une erreur explicite s'il manque.
+
 Importer ce dépôt à sa racine. `vercel.json` décrit les deux services ; `api/build.py` applique les migrations Alembic et initialise uniquement le catalogue fictif. Configurer des secrets de production, sans préfixe `NEXT_PUBLIC_` :
 
 - `DATABASE_URL` : compte `shopeo_runtime`, pooler transaction PostgreSQL, SSL obligatoire ; préparations psycopg désactivées.

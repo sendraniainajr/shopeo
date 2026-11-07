@@ -15,6 +15,22 @@ def test_catalog_and_health(client):
     assert client.get("/api/products/missing").status_code == 404
 
 
+def test_catalog_releases_expired_last_unit_without_another_checkout(client):
+    login(client)
+    with SessionLocal.begin() as db:
+        db.get(Variant, "support-aluminium-0").stock = 1
+    pending = order(client).json()
+    with SessionLocal.begin() as db:
+        db.get(Order, pending["id"]).expires_at = int(time.time()) - 1
+    catalog = client.get("/api/products").json()
+    support = next(p for p in catalog if p["id"] == "support-aluminium")
+    variant = next(v for v in support["variants"] if v["id"] == "support-aluminium-0")
+    assert variant["available"] == 1
+    with SessionLocal() as db:
+        assert db.get(Order, pending["id"]).payment == "abandoned"
+        assert db.get(Variant, "support-aluminium-0").reserved == 0
+
+
 def test_csrf_and_origin(client):
     assert client.post("/api/auth/demo/customer", json={}).status_code == 403
     assert (
@@ -372,3 +388,26 @@ def test_hosted_simulation_does_not_need_admin_shortcuts(client, monkeypatch):
         ).json()["payment"]
         == "paid"
     )
+
+
+def test_proxy_rate_limit_uses_only_authenticated_client_address(client, monkeypatch):
+    from shopeo.security import limit
+    from starlette.requests import Request
+    from fastapi import HTTPException
+    import pytest
+
+    secret = "test-internal-proxy-secret-32-characters-minimum"
+    monkeypatch.setenv("INTERNAL_PROXY_SECRET", secret)
+
+    def request(ip, authenticated=False):
+        headers = [(b"x-shopeo-client-ip", ip.encode())]
+        if authenticated:
+            headers.append((b"x-shopeo-proxy-token", secret.encode()))
+        return Request({"type": "http", "headers": headers, "client": ("proxy", 1234)})
+
+    limit(request("first"), "spoof", 1, 300)
+    with pytest.raises(HTTPException) as rejected:
+        limit(request("second"), "spoof", 1, 300)
+    assert rejected.value.status_code == 429
+    limit(request("first", True), "trusted", 1, 300)
+    limit(request("second", True), "trusted", 1, 300)

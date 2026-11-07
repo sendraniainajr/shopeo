@@ -50,7 +50,14 @@ from .security import (
     COOKIE,
     PAYMENTS_SIMULATED,
 )
-from .commerce import product_json, order_json, create_order, settle, cancel_order
+from .commerce import (
+    product_json,
+    order_json,
+    create_order,
+    settle,
+    cancel_order,
+    expire_orders,
+)
 from .automation import consume, process_once
 from .seed import seed
 
@@ -280,7 +287,18 @@ def forgot(
                 id=secrets.token_hex(16),
                 recipient=user.email,
                 subject="Récupération d’accès",
-                body=f"Lien de démonstration : http://127.0.0.1:3100/compte/reinitialiser?token={token}",
+                body=(
+                    "Lien de démonstration : "
+                    + (
+                        os.environ.get("PUBLIC_SITE_URL")
+                        or (
+                            "https://" + os.environ["VERCEL_PROJECT_PRODUCTION_URL"]
+                            if os.environ.get("VERCEL_PROJECT_PRODUCTION_URL")
+                            else "http://127.0.0.1:3100"
+                        )
+                    ).rstrip("/")
+                    + f"/compte/reinitialiser?token={token}"
+                ),
             )
         )
     return {
@@ -316,6 +334,7 @@ def reset(
 
 @app.get("/api/products")
 def products(db: DBSession = Depends(get_db, scope="function")):
+    expire_orders(db)
     return [
         product_json(p)
         for p in db.scalars(select(Product).where(Product.archived == False))
@@ -324,6 +343,7 @@ def products(db: DBSession = Depends(get_db, scope="function")):
 
 @app.get("/api/products/{slug}")
 def product(slug: str, db: DBSession = Depends(get_db, scope="function")):
+    expire_orders(db)
     p = db.get(Product, slug)
     if not p or p.archived:
         raise HTTPException(404, "Produit introuvable.")
