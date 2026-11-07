@@ -10,6 +10,8 @@
 - n8n local réel : workflow publié, événement signé, callback authentifié, reçu idempotent et brouillon enregistré. Aucun transport email réel.
 - Sauvegarde chiffrée et restauration dans une base locale distincte vérifiées pendant le développement.
 
-La capture desktop correspond au design violet/turquoise/orange publié. Les captures sont des preuves visuelles, pas des tests automatisés d'accessibilité. La vérification responsive doit être reprise après chaque changement important de mise en page.
+La capture desktop correspond au design violet/turquoise/orange publié. Le site publié a été contrôlé à 360, 768 et 1440 pixels ; aucun débordement horizontal du document n'a été constaté. La capture mobile montre la navigation violette et le bouton panier orange. Les captures sont des preuves visuelles, pas des tests automatisés d'accessibilité. La vérification responsive doit être reprise après chaque changement important de mise en page.
 
-Limites d'exploitation : paiement et livraison fictifs, emails capturés en base, IA externe désactivée, n8n hébergé uniquement en local. Le site public utilise le traitement local d'outbox avec reprise quotidienne. L'administration distante nécessite l'initialisation privée d'un compte avec TOTP ; les raccourcis admin locaux sont désactivés en ligne.
+L'administrateur distant a été initialisé après autorisation explicite, avec mot de passe aléatoire et TOTP. La connexion et l'approbation d'un brouillon fictif ont été vérifiées dans l'interface publiée. Les identifiants ne sont pas versionnés. Les raccourcis admin locaux sont désactivés en ligne.
+
+Limites d'exploitation : paiement et livraison fictifs, emails capturés en base, IA externe désactivée, n8n hébergé uniquement en local. Le site public utilise le traitement local d'outbox avec reprise quotidienne.

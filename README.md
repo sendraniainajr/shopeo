@@ -60,7 +60,7 @@ Importer ce dépôt à sa racine. `vercel.json` décrit les deux services ; `api
 - `DATABASE_SCHEMA=shopeo`, `LOCAL_DEMO=0`, `COOKIE_SECURE=1`, `AUTO_CREATE_SCHEMA=0`, `SEED_DEMO=0`, `PAYMENTS_SIMULATED=1`, `AI_ALLOW_EXTERNAL=0`.
 - `INTERNAL_PROXY_SECRET` et `CRON_SECRET` : valeurs aléatoires distinctes d'au moins 32 caractères.
 
-Les comptes métier ne sont pas créés en ligne. L'inscription client est disponible. Pour initialiser un administrateur, fournir ponctuellement `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD` (20 caractères minimum), `BOOTSTRAP_ADMIN_TOTP_SECRET` (secret TOTP base32, 32 caractères minimum), puis retirer ces variables après le premier déploiement. Le bootstrap refuse de promouvoir un compte existant. Les secrets d'administration doivent être remis par un canal privé, jamais dans Git.
+Le déploiement ne crée pas automatiquement de comptes métier. L'inscription client est disponible. Pour initialiser un administrateur, fournir ponctuellement `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD` (20 caractères minimum), `BOOTSTRAP_ADMIN_TOTP_SECRET` (secret TOTP base32, 32 caractères minimum), puis retirer ces variables après le premier déploiement. Le bootstrap refuse de promouvoir un compte existant. Les secrets d'administration doivent être remis par un canal privé, jamais dans Git.
 
 Ne pas partager la base de production avec des branches non fiables. Utiliser une base séparée pour les previews. Le compte runtime dispose de SELECT/INSERT/UPDATE métier et de DELETE uniquement sur sessions, jetons de réinitialisation et compteurs de limitation. La RLS autorise ce rôle serveur ; l'autorisation par utilisateur est effectuée dans FastAPI. La table Alembic sans politique runtime est volontairement inaccessible à ce rôle.
 

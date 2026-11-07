@@ -587,3 +587,47 @@ thead {
     border-radius: 21px;
   }
 }
+/* Administration: compact forms retain readable labels on mobile. */
+.variant-controls {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #e7dcf5;
+  border-radius: 16px;
+}
+.variant-controls summary {
+  cursor: pointer;
+  color: #6522c7;
+  font-weight: 700;
+}
+.variant-controls h4 {
+  margin: 18px 0 4px;
+}
+.variant-controls p {
+  font-size: 13px;
+  color: #685e79;
+}
+.variant-row,
+.order-filters {
+  display: grid;
+  gap: 14px;
+  align-items: end;
+  margin: 16px 0;
+}
+.variant-row {
+  grid-template-columns: minmax(0, 1fr) 150px auto;
+}
+.order-filters {
+  grid-template-columns: minmax(0, 1fr) 230px;
+}
+.variant-row label,
+.order-filters label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+@media (max-width: 650px) {
+  .variant-row,
+  .order-filters {
+    grid-template-columns: 1fr;
+  }
+}

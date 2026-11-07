@@ -34,6 +34,7 @@ import {
 } from "../../lib/api";
 import { Logo, Photo, Badge, Loading, ErrorBox } from "../ui";
 import type { Shared } from "../types";
+import { VariantControls } from "./VariantControls";
 
 export function Admin({ shared: s }: { shared: Shared }) {
   const router = useRouter();
@@ -43,7 +44,9 @@ export function Admin({ shared: s }: { shared: Shared }) {
     [busy, setBusy] = useState(false),
     [editing, setEditing] = useState<Product | null>(null),
     [create, setCreate] = useState(false),
-    [menu, setMenu] = useState(false);
+    [menu, setMenu] = useState(false),
+    [orderQuery, setOrderQuery] = useState(""),
+    [paymentFilter, setPaymentFilter] = useState("");
   const reload = useCallback(async () => {
     if (s.user?.role === "admin") {
       setData(await api<Overview>("/admin/overview"));
@@ -115,7 +118,16 @@ export function Admin({ shared: s }: { shared: Shared }) {
   const low = data.products.flatMap((p) =>
     p.variants.filter((v) => v.stock <= 3).map((v) => ({ p, v })),
   );
-  const visibleOrders = data.orders;
+  const visibleOrders =
+    section === "orders"
+      ? data.orders.filter(
+          (order) =>
+            (!paymentFilter || order.payment === paymentFilter) &&
+            (order.number + " " + order.customer)
+              .toLocaleLowerCase("fr")
+              .includes(orderQuery.toLocaleLowerCase("fr")),
+        )
+      : data.orders;
   function OrdersTable() {
     return (
       <div className="table-scroll">
@@ -474,6 +486,30 @@ export function Admin({ shared: s }: { shared: Shared }) {
         {section === "orders" && (
           <section className="admin-panel">
             <h2>Toutes les commandes</h2>
+            <div className="order-filters">
+              <label>
+                Rechercher une commande ou un client
+                <input
+                  type="search"
+                  value={orderQuery}
+                  onChange={(e) => setOrderQuery(e.target.value)}
+                />
+              </label>
+              <label>
+                Paiement
+                <select
+                  value={paymentFilter}
+                  onChange={(e) => setPaymentFilter(e.target.value)}
+                >
+                  <option value="">Tous les paiements</option>
+                  <option value="pending">En attente</option>
+                  <option value="paid">Payé</option>
+                  <option value="failed">Refusé</option>
+                  <option value="abandoned">Abandonné</option>
+                  <option value="refunded">Remboursé</option>
+                </select>
+              </label>
+            </div>
             {OrdersTable()}
           </section>
         )}
@@ -590,6 +626,7 @@ export function Admin({ shared: s }: { shared: Shared }) {
                     }
                   />
                 ))}
+                <VariantControls product={p} busy={busy} save={act} />
               </div>
             ))}
           </section>
